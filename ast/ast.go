@@ -28,6 +28,11 @@ type Program struct {
 	Statements []Statement
 }
 
+type Identifier struct {
+	Token token.Token // token.IDENT词法单元
+	Value string
+}
+
 func (p *Program) String() string {
 	var out bytes.Buffer
 
@@ -44,11 +49,6 @@ func (p *Program) TokenLiteral() string {
 	} else {
 		return ""
 	}
-}
-
-type Identifier struct {
-	Token token.Token // token.IDENT词法单元
-	Value string
 }
 
 func (i *Identifier) String() string { return i.Value }
@@ -72,6 +72,11 @@ type ReturnStatement struct {
 type ExpressionStatement struct {
 	Token      token.Token // 第一个词法单元
 	Expression Expression
+}
+
+type IntegerLiteral struct {
+	Token token.Token // token.INT词法单元
+	Value int64
 }
 
 func (ls *LetStatement) statementNode() {
@@ -128,3 +133,7 @@ func (es *ExpressionStatement) String() string {
 	}
 	return ""
 }
+
+func (il *IntegerLiteral) expressionNode()      {}
+func (il *IntegerLiteral) TokenLiteral() string { return il.Token.Literal }
+func (il *IntegerLiteral) String() string       { return il.Token.Literal }
