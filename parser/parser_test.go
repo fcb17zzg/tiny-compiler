@@ -136,7 +136,7 @@ func TestIntegerLiteralExpression(t *testing.T) {
 	input := "5;"
 
 	l := lexer.New(input)
-	p := new(l)
+	p := New(l)
 	program := p.ParserProgram()
 	checkParserError(t, p)
 
@@ -192,7 +192,7 @@ func TestParsingPrefixExpressions(t *testing.T) {
 		if exp.Operator != tt.operator {
 			t.Fatalf("exp.Operator is not '%s'. got=%s", tt.operator, exp.Operator)
 		}
-		if !testIntegerLiteral(t, exp.Right, tt.IntegerValue) {
+		if !p.testIntegerLiteral(t, exp.Right, tt.IntegerValue) {
 			return
 		}
 	}
@@ -330,6 +330,55 @@ func (p *Parser) testIntegerLiteral(t *testing.T, il ast.Expression, value int64
 	}
 	if integ.TokenLiteral() != fmt.Sprintf("%d", value) {
 		t.Errorf("integ.TokenLiteral not %d. got=%s", value, integ.TokenLiteral())
+		return false
+	}
+	return true
+}
+
+func (p *Parser) testIdentifier(t *testing.T, exp ast.Expression, value string) bool {
+	ident, ok := exp.(*ast.Identifier)
+	if !ok {
+		t.Errorf("exp not *ast.Identifier. got=%T", exp)
+		return false
+	}
+	if ident.Value != value {
+		t.Errorf("ident.Value not %s. got=%s", value, ident.Value)
+		return false
+	}
+	if ident.TokenLiteral() != value {
+		t.Errorf("ident.TokenLiteral not %s. got=%s", value, ident.TokenLiteral())
+		return false
+	}
+	return true
+}
+
+func (p *Parser) testLiteralExpression(t *testing.T, exp ast.Expression, expected interface{}) bool {
+	switch v := expected.(type) {
+	case int:
+		return p.testIntegerLiteral(t, exp, int64(v))
+	case int64:
+		return p.testIntegerLiteral(t, exp, v)
+	case string:
+		return p.testIdentifier(t, exp, v)
+	}
+	t.Errorf("type of exp not handled. got=%T", exp)
+	return false
+}
+
+func (p *Parser) testInfixExpression(t *testing.T, exp ast.Expression, left interface{}, operator string, right interface{}) bool {
+	ops, ok := exp.(*ast.InfixExpression)
+	if !ok {
+		t.Errorf("exp is not ast.InfixExpression. got=%T(%s)", exp, exp)
+		return false
+	}
+	if !p.testLiteralExpression(t, ops.Left, left) {
+		return false
+	}
+	if ops.Operator != operator {
+		t.Errorf("exp.Operator is not '%s'. got=%q", operator, ops.Operator)
+		return false
+	}
+	if !p.testLiteralExpression(t, ops.Right, right) {
 		return false
 	}
 	return true
