@@ -3,6 +3,7 @@ package ast
 import (
 	"bytes"
 	"go-monkey-compiler/token"
+	"strings"
 )
 
 // 每个节点都需要实现Node接口
@@ -12,6 +13,7 @@ type Node interface {
 	String() string
 }
 
+// 语句
 type Statement interface {
 	// 实现Node接口
 	Node
@@ -19,15 +21,18 @@ type Statement interface {
 	statementNode()
 }
 
+// 表达式
 type Expression interface {
 	Node
 	expressionNode()
 }
 
+// 整个程序的AST的根节点
 type Program struct {
 	Statements []Statement
 }
 
+// 标识符
 type Identifier struct {
 	Token token.Token // token.IDENT词法单元
 	Value string
@@ -107,6 +112,12 @@ type IfExpression struct {
 type BlockStatement struct {
 	Token      token.Token // '{'词法单元
 	Statements []Statement
+}
+
+type FunctionLiteral struct {
+	Token      token.Token // 'fn'词法单元
+	Parameters []*Identifier
+	Body       *BlockStatement
 }
 
 func (ls *LetStatement) statementNode() {
@@ -226,6 +237,25 @@ func (bs *BlockStatement) String() string {
 	for _, s := range bs.Statements {
 		out.WriteString(s.String())
 	}
+
+	return out.String()
+}
+
+func (fl *FunctionLiteral) expressionNode()      {}
+func (fl *FunctionLiteral) TokenLiteral() string { return fl.Token.Literal }
+func (fl *FunctionLiteral) String() string {
+	var out bytes.Buffer
+
+	params := []string{}
+	for _, p := range fl.Parameters {
+		params = append(params, p.String())
+	}
+
+	out.WriteString(fl.TokenLiteral())
+	out.WriteString("(")
+	out.WriteString(strings.Join(params, ", "))
+	out.WriteString(") ")
+	out.WriteString(fl.Body.String())
 
 	return out.String()
 }
