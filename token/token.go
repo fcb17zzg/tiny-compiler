@@ -4,61 +4,62 @@ package token
 type TokenType string
 
 type Token struct {
-   Type TokenType
-   // 字面量
-   Literal string
+	Type TokenType
+	// 字面量
+	Literal string
 }
 
 const (
-    // 特殊类型
-    ILLEGAL = "ILLEGAL" // 未知字符
-    EOF     = "EOF"     // 文件结尾
+	// 特殊类型
+	ILLEGAL = "ILLEGAL" // 未知字符
+	EOF     = "EOF"     // 文件结尾
 
-    // 标识符+字面量
-    IDENT = "IDENT" // add, foobar, x, y
-    INT   = "INT"   // 1343456
+	// 标识符+字面量
+	IDENT  = "IDENT" // add, foobar, x, y
+	INT    = "INT"   // 1343456
+	STRING = "STRING"
 
-    // 运算符
-    ASSIGN = "="
-    PLUS   = "+"
+	// 运算符
+	ASSIGN   = "="
+	PLUS     = "+"
 	MINUS    = "-"
-    BANG     = "!"
-    ASTERISK = "*"
-    SLASH    = "/"
+	BANG     = "!"
+	ASTERISK = "*"
+	SLASH    = "/"
 
-    LT = "<"
-    GT = ">"
+	LT = "<"
+	GT = ">"
 
-	EQ	= "=="
+	EQ     = "=="
 	NOT_EQ = "!="
 
-    // 分隔符
-    COMMA     = ","
-    SEMICOLON = ";"
+	// 分隔符
+	COMMA     = ","
+	SEMICOLON = ";"
 
-    LPAREN = "("
-    RPAREN = ")"
-    LBRACE = "{"
-    RBRACE = "}"
+	LPAREN = "("
+	RPAREN = ")"
+	LBRACE = "{"
+	RBRACE = "}"
 
-    // 关键字
-    FUNCTION = "FUNCTION"
-    LET      = "LET"
+	// 关键字
+	FUNCTION = "FUNCTION"
+	LET      = "LET"
 	TRUE     = "TRUE"
-    FALSE    = "FALSE"
-    IF       = "IF"
-    ELSE     = "ELSE"
-    RETURN   = "RETURN"
+	FALSE    = "FALSE"
+	IF       = "IF"
+	ELSE     = "ELSE"
+	RETURN   = "RETURN"
 )
 
-var keywords = map[string]TokenType {
-	"fn":	FUNCTION,
-	"let":	LET,
+var keywords = map[string]TokenType{
+	"fn":     FUNCTION,
+	"let":    LET,
 	"true":   TRUE,
-    "false":  FALSE,
-    "if":     IF,
-    "else":   ELSE,
-    "return": RETURN,
+	"false":  FALSE,
+	"if":     IF,
+	"else":   ELSE,
+	"return": RETURN,
 }
 
 func LookupIdent(ident string) TokenType {
@@ -66,5 +67,5 @@ func LookupIdent(ident string) TokenType {
 		return tok
 	}
 	return IDENT
-	
+
 }
