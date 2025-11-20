@@ -30,7 +30,7 @@ func testIntegerObject(expected int64, actual interface{}) error {
 
 type runVmTestCase struct {
 	input    string
-	expected int64
+	expected interface{}
 }
 
 func runVmTests(t *testing.T, tests []runVmTestCase) {
@@ -81,7 +81,7 @@ func TestIntegerArithmetic(t *testing.T) {
 		{"1 - 2", -1},
 		{"1 * 2", 2},
 		{"4 / 2", 2},
-		{"50 / 2 * 2 + 10 - 5", 50},
+		{"50 / 2 * 2 + 10 - 5", 55},
 		{"5 + 5 + 5 + 5 - 10", 10},
 		{"2 * 2 * 2 * 2 * 2", 32},
 		{"5 * 2 + 10", 20},
@@ -94,8 +94,25 @@ func TestIntegerArithmetic(t *testing.T) {
 
 func TestBooleanExpressions(t *testing.T) {
 	tests := []runVmTestCase{
-		{"true", 1},
-		{"false", 0},
+		{"true", true},
+		{"false", false},
+		{"1 < 2", true},
+		{"1 > 2", false},
+		{"1 < 1", false},
+		{"1 > 1", false},
+		{"1 == 1", true},
+		{"1 != 1", false},
+		{"1 == 2", false},
+		{"1 != 2", true},
+		{"true == true", true},
+		{"false == false", true},
+		{"true == false", false},
+		{"true != false", true},
+		{"false != true", true},
+		{"(1 < 2) == true", true},
+		{"(1 < 2) == false", false},
+		{"(1 > 2) == true", false},
+		{"(1 > 2) == false", true},
 	}
 
 	runVmTests(t, tests)
