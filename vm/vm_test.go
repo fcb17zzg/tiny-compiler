@@ -139,3 +139,12 @@ func testBooleanObject(expected bool, actual object.Object) error {
 	}
 	return nil
 }
+
+func TestConditions(t *testing.T) {
+	tests := []runVmTestCase{
+		{"if (true) { 10 }", 10},
+		{"if (true) { 10 } else { 20 }", 10},
+		{"if (1 < 2) { 10 }", 10},
+	}
+	runVmTests(t, tests)
+}
