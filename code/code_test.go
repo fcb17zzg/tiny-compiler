@@ -1,6 +1,9 @@
 package code
 
-import "testing"
+import (
+	testing
+	"go-monkey-compiler/code"
+)
 
 func TestMake(t *testing.T) {
 	tests := []struct {
@@ -77,4 +80,55 @@ func TestReadOperands(t *testing.T) {
 			}
 		}
 	}
+}
+
+func TestGlobalLetStatements(t *testing.T) {
+	tests := []compilerTestCase{
+		{
+			input: `
+			let one = 1;
+			let two = 2;
+			`,
+			expectedConstants: []interface{}{
+				1,
+				2,
+			},
+			expectedInstructions: []Instructions{
+				code.Make(OpConstant, 0),
+				code.Make(OpSetGlobal, 0),
+				code.Make(OpConstant, 1),
+				code.Make(OpSetGlobal, 1),
+			},
+		},
+		{
+			input: `
+			let one = 1;
+			one;
+			`,
+			expectedConstants: []interface{}{1},
+			expectedInstructions: []Instructions{
+				code.Make(OpConstant, 0),
+				code.Make(OpSetGlobal, 0),
+				code.Make(OpGetGlobal, 0),
+				code.Make(OpPop),
+			},
+		},
+		{
+			input: `
+			let one = 1;
+			let two = one;
+			two;
+			`,
+			expectedConstants: []interface{}{1},
+			expectedInstructions: []Instructions{
+				code.Make(OpConstant, 0),
+				code.Make(OpSetGlobal, 0),
+				code.Make(OpGetGlobal, 0),
+				code.Make(OpSetGlobal, 1),
+				code.Make(OpGetGlobal, 1),
+				code.Make(OpPop),
+			},
+		},
+	}
+	runCompilerTests(t, tests)
 }
