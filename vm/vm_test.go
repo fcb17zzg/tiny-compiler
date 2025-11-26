@@ -156,3 +156,12 @@ func TestConditions(t *testing.T) {
 	}
 	runVmTests(t, tests)
 }
+
+func TestGlobalLetStatements(t *testing.T) {
+	tests := []runVmTestCase{
+		{"let one = 1; one", 1},
+		{"let one = 1; let two = 2; one + two", 3},
+		{"let one = 1; let two = one; two", 1},
+	}
+	runVmTests(t, tests)
+}
