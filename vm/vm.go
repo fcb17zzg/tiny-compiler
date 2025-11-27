@@ -114,6 +114,31 @@ func (vm *VM) Run() error {
 			if err != nil {
 				return err
 			}
+		case code.OpArray:
+			numElements := int(code.ReadUint16(vm.instructions[ip+1:]))
+			ip += 2
+
+			array := vm.buildArray(vm.sp-numElements, vm.sp)
+			vm.sp = vm.sp - numElements
+
+			err := vm.push(array)
+			if err != nil {
+				return err
+			}
+		case code.OpHash:
+			numPairs := int(code.ReadUint16(vm.instructions[ip+1:]))
+			ip += 2
+
+			hash, err := vm.buildHash(vm.sp-numPairs, vm.sp)
+			if err != nil {
+				return err
+			}
+			vm.sp = vm.sp - numPairs
+
+			err = vm.push(hash)
+			if err != nil {
+				return err
+			}
 		default:
 			return fmt.Errorf("unknown opcode: %d", op)
 		}
@@ -275,4 +300,31 @@ func (vm *VM) executeBinaryStringOperation(op code.Opcode, left, right object.Ob
 	}
 
 	return vm.push(&object.String{Value: result})
+}
+
+func (vm *VM) buildArray(start, end int) object.Object {
+	elements := make([]object.Object, end-start)
+	for i := start; i < end; i++ {
+		elements[i-start] = vm.stack[i]
+	}
+	return &object.Array{Elements: elements}
+}
+
+func (vm *VM) buildHash(start, end int) (*object.Hash, error) {
+	hashedPairs := make(map[object.HashKey]object.HashPair)
+
+	for i := start; i < end; i += 2 {
+		key := vm.stack[i]
+		value := vm.stack[i+1]
+
+		pair := object.HashPair{Key: key, Value: value}
+		hashKey, ok := key.(object.Hashable)
+		if !ok {
+			return nil, fmt.Errorf("unusable as hash key: %s", key.Type())
+		}
+
+		hashedPairs[hashKey.HashKey()] = pair
+	}
+
+	return &object.Hash{Pairs: hashedPairs}, nil
 }
