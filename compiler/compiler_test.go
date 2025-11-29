@@ -483,7 +483,41 @@ func TestFunctions(t *testing.T) {
 					code.Make(code.OpConstant, 0),
 					code.Make(code.OpConstant, 1),
 					code.Make(code.OpAdd),
-					code.Make(code.OpReturn),
+					code.Make(code.OpReturnValue),
+				},
+			},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 2),
+				code.Make(code.OpPop),
+			},
+		},
+		{
+			input: `fn() { 5 + 10 }`,
+			expectedConstants: []interface{}{
+				5,
+				10,
+				[]code.Instructions{
+					code.Make(code.OpConstant, 0),
+					code.Make(code.OpConstant, 1),
+					code.Make(code.OpAdd),
+					code.Make(code.OpReturnValue),
+				},
+			},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 2),
+				code.Make(code.OpPop),
+			},
+		},
+		{
+			input: `fn() { 1; 2}`,
+			expectedConstants: []interface{}{
+				1,
+				2,
+				[]code.Instructions{
+					code.Make(code.OpConstant, 0),
+					code.Make(code.OpPop),
+					code.Make(code.OpConstant, 1),
+					code.Make(code.OpReturnValue),
 				},
 			},
 			expectedInstructions: []code.Instructions{
@@ -505,7 +539,7 @@ func TestCompilerScopes(t *testing.T) {
 
 	compiler.emit(code.OpMul)
 
-	compiler.EnterScope()
+	compiler.enterScope()
 	if compiler.scopeIndex != 1 {
 		t.Errorf("scopeIndex wrong. got=%d, want=1",
 			compiler.scopeIndex)
@@ -517,7 +551,7 @@ func TestCompilerScopes(t *testing.T) {
 			len(compiler.scopes[compiler.scopeIndex].instructions))
 	}
 
-	compiler.LeaveScope()
+	compiler.leaveScope()
 	if compiler.scopeIndex != 0 {
 		t.Errorf("scopeIndex wrong. got=%d, want=0",
 			compiler.scopeIndex)
@@ -541,4 +575,22 @@ func TestCompilerScopes(t *testing.T) {
 		t.Errorf("previous instruction wrong. got=%d, want=%d",
 			previous.Opcode, code.OpMul)
 	}
+}
+
+func TestFunctionWithoutReturnValue(t *testing.T) {
+	tests := []CompilerTestCase{
+		{
+			input: `fn() {}`,
+			expectedConstants: []interface{}{
+				[]code.Instructions{
+					code.Make(code.OpReturn),
+				},
+			},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpPop),
+			},
+		},
+	}
+	runCompilerTests(t, tests)
 }
