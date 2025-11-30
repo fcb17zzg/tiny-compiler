@@ -529,54 +529,6 @@ func TestFunctions(t *testing.T) {
 	runCompilerTests(t, tests)
 }
 
-func TestCompilerScopes(t *testing.T) {
-	compiler := New()
-
-	if compiler.scopeIndex != 0 {
-		t.Errorf("scopeIndex wrong. got=%d, want=0",
-			compiler.scopeIndex)
-	}
-
-	compiler.emit(code.OpMul)
-
-	compiler.enterScope()
-	if compiler.scopeIndex != 1 {
-		t.Errorf("scopeIndex wrong. got=%d, want=1",
-			compiler.scopeIndex)
-	}
-
-	compiler.emit(code.OpSub)
-	if len(compiler.scopes[compiler.scopeIndex].instructions) != 1 {
-		t.Errorf("instructions length wrong. got=%d, want=1",
-			len(compiler.scopes[compiler.scopeIndex].instructions))
-	}
-
-	compiler.leaveScope()
-	if compiler.scopeIndex != 0 {
-		t.Errorf("scopeIndex wrong. got=%d, want=0",
-			compiler.scopeIndex)
-	}
-
-	compiler.emit(code.OpAdd)
-
-	if len(compiler.scopes[compiler.scopeIndex].instructions) != 2 {
-		t.Errorf("instructions length wrong. got=%d, want=2",
-			len(compiler.scopes[compiler.scopeIndex].instructions))
-	}
-
-	last := compiler.scopes[compiler.scopeIndex].lastInstruction
-	if last.Opcode != code.OpAdd {
-		t.Errorf("last instruction wrong. got=%d, want=%d",
-			last.Opcode, code.OpAdd)
-	}
-
-	previous := compiler.scopes[compiler.scopeIndex].previousInstruction
-	if previous.Opcode != code.OpMul {
-		t.Errorf("previous instruction wrong. got=%d, want=%d",
-			previous.Opcode, code.OpMul)
-	}
-}
-
 func TestFunctionWithoutReturnValue(t *testing.T) {
 	tests := []CompilerTestCase{
 		{
@@ -708,4 +660,68 @@ func TestLetStatementScopes(t *testing.T) {
 		},
 	}
 	runCompilerTests(t, tests)
+}
+
+func TestCompilerScopes(t *testing.T) {
+	compiler := New()
+	if compiler.scopeIndex != 0 {
+		t.Errorf("scopeIndex wrong. got=%d, want=0",
+			compiler.scopeIndex)
+	}
+	globalSymbolTable := compiler.symbolTable
+	compiler.emit(code.OpMul)
+
+	compiler.enterScope()
+	if compiler.scopeIndex != 1 {
+		t.Errorf("scopeIndex wrong. got=%d, want=1",
+			compiler.scopeIndex)
+	}
+
+	compiler.emit(code.OpSub)
+
+	if len(compiler.scopes[compiler.scopeIndex].instructions) != 1 {
+		t.Errorf("instructions length wrong. got=%d, want=1",
+			len(compiler.scopes[compiler.scopeIndex].instructions))
+	}
+
+	last := compiler.scopes[compiler.scopeIndex].lastInstruction
+	if last.Opcode != code.OpSub {
+		t.Errorf("last instruction wrong. got=%d, want=%d",
+			last.Opcode, code.OpSub)
+	}
+
+	compiler.leaveScope()
+	if compiler.scopeIndex != 0 {
+		t.Errorf("scopeIndex wrong. got=%d, want=0",
+			compiler.scopeIndex)
+	}
+
+	if compiler.symbolTable != globalSymbolTable {
+		t.Errorf("symbolTable wrong. got=%p, want=%p",
+			compiler.symbolTable, globalSymbolTable)
+	}
+
+	if compiler.symbolTable.Outer != nil {
+		t.Errorf("symbolTable.Outer should be nil, got=%p",
+			compiler.symbolTable.Outer)
+	}
+
+	compiler.emit(code.OpAdd)
+
+	if len(compiler.scopes[compiler.scopeIndex].instructions) != 2 {
+		t.Errorf("instructions length wrong. got=%d, want=2",
+			len(compiler.scopes[compiler.scopeIndex].instructions))
+	}
+
+	last = compiler.scopes[compiler.scopeIndex].lastInstruction
+	if last.Opcode != code.OpAdd {
+		t.Errorf("last instruction wrong. got=%d, want=%d",
+			last.Opcode, code.OpAdd)
+	}
+
+	previous := compiler.scopes[compiler.scopeIndex].previousInstruction
+	if previous.Opcode != code.OpMul {
+		t.Errorf("previous instruction wrong. got=%d, want=%d",
+			previous.Opcode, code.OpMul)
+	}
 }
