@@ -80,21 +80,21 @@ func TestResolveLocal(t *testing.T) {
 	local.Define("d")
 
 	expected := []Symbol{
-		{Symbol: "a", Scope: GlobalScope, Index: 0},
-		{Symbol: "b", Scope: GlobalScope, Index: 1},
-		{Symbol: "c", Scope: LocalScope, Index: 0},
-		{Symbol: "d", Scope: LocalScope, Index: 1},
+		{Name: "a", Scope: GlobalScope, Index: 0},
+		{Name: "b", Scope: GlobalScope, Index: 1},
+		{Name: "c", Scope: LocalScope, Index: 0},
+		{Name: "d", Scope: LocalScope, Index: 1},
 	}
 
 	for _, sym := range expected {
-		resolved, ok := local.Resolve(sym.Symbol)
+		resolved, ok := local.Resolve(sym.Name)
 		if !ok {
-			t.Fatalf("symbol %s not resolved", sym.Symbol)
+			t.Fatalf("symbol %s not resolved", sym.Name)
 			continue
 		}
-		if result != sym {
+		if resolved != sym {
 			t.Errorf("symbol %s resolved incorrectly. got=%+v, want=%+v",
-				sym.Symbol, resolved, sym)
+				sym.Name, resolved, sym)
 		}
 	}
 }
@@ -117,7 +117,7 @@ func TestResolveNestedLocal(t *testing.T) {
 		expectedSymbols []Symbol
 	}{
 		{
-			firstLocal,
+			local1,
 			[]Symbol{
 				Symbol{Name: "a", Scope: GlobalScope, Index: 0},
 				Symbol{Name: "b", Scope: GlobalScope, Index: 1},
@@ -126,7 +126,7 @@ func TestResolveNestedLocal(t *testing.T) {
 			},
 		},
 		{
-			secondLocal,
+			local2,
 			[]Symbol{
 				Symbol{Name: "a", Scope: GlobalScope, Index: 0},
 				Symbol{Name: "b", Scope: GlobalScope, Index: 1},
