@@ -446,10 +446,10 @@ func (vm *VM) CallFunction(numArgs int) error {
 		return fmt.Errorf("calling non-function: %s", vm.stack[vm.sp-1-numArgs].Type())
 	}
 
-	if numArgs != fn.NumParameters {
-		return fmt.Errorf("wrong number of arguments. got=%d, want=%d",
-			numArgs, fn.NumParameters)
-	}
+	// if numArgs != fn.NumParameters {
+	// 	return fmt.Errorf("wrong number of arguments. got=%d, want=%d",
+	// 		numArgs, fn.NumParameters)
+	// }
 	frame := NewFrame(fn, vm.sp-numArgs)
 	vm.pushFrame(frame)
 	vm.sp = frame.basePointer + fn.NumLocals

@@ -456,9 +456,9 @@ func TestCallingFunctionWithArgumentsAndBingdings(t *testing.T) {
 				let c = a + b;
 				c 
 			};
-			sum(1 + 2) + sum(3 + 4);
+			sum(2, 2) + sum(3, 4);
 			`,
-			expected: 10,
+			expected: 11,
 		},
 		{
 			input: `
