@@ -3,7 +3,7 @@ package object
 import "fmt"
 
 var Builtins = []struct {
-	name    string
+	Name    string
 	Builtin *Builtin
 }{
 	{
@@ -123,7 +123,7 @@ func newError(format string, a ...interface{}) *Error {
 
 func GetBuiltinByName(name string) *Builtin {
 	for _, def := range Builtins {
-		if def.name == name {
+		if def.Name == name {
 			return def.Builtin
 		}
 	}
