@@ -224,6 +224,12 @@ func (vm *VM) Run() error {
 			if err != nil {
 				return err
 			}
+		case code.OpCurrentClosure:
+			currentClosure := vm.currentFrame().fn
+			err := vm.push(currentClosure)
+			if err != nil {
+				return err
+			}
 		default:
 			return fmt.Errorf("unknown opcode: %d", op)
 		}
