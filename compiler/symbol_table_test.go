@@ -237,19 +237,18 @@ func TestResolveFree(t *testing.T) {
 				t.Errorf("expected %s to resolve to %+v, got=%+v",
 					sym.Name, sym, result)
 			}
+		}
+		if len(tt.table.FreeSymbols) != len(tt.expectedFreeSymbols) {
+			t.Errorf("wrong numbers of free symbols. got=%d, want=%d",
+				len(tt.table.FreeSymbols), len(tt.expectedFreeSymbols))
+			continue
+		}
 
-			if len(tt.table.FreeSymbols) != len(tt.expectedFreeSymbols) {
-				t.Errorf("wrong numbers of free symbols. got=%d, want=%d",
-					len(tt.table.FreeSymbols), len(tt.expectedFreeSymbols))
-				continue
-			}
-
-			for i, sym := range tt.expectedFreeSymbols {
-				result := tt.table.FreeSymbols[i]
-				if result != sym {
-					t.Errorf("wrong free symbol. got=%+v, want=%+v",
-						result, sym)
-				}
+		for i, sym := range tt.expectedFreeSymbols {
+			result := tt.table.FreeSymbols[i]
+			if result != sym {
+				t.Errorf("wrong free symbol. got=%+v, want=%+v",
+					result, sym)
 			}
 		}
 	}
